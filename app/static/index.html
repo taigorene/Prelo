@@ -1,0 +1,216 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Prelo — Markdown para PDF e Word</title>
+  <meta name="description" content="Converta arquivos Markdown em PDF ou Word (.docx) mantendo tabelas, blocos de código, diagramas Mermaid, fórmulas e imagens. Também disponível por API REST documentada com Swagger.">
+  <meta name="color-scheme" content="light dark">
+  <meta name="theme-color" media="(prefers-color-scheme: light)" content="#eceef2">
+  <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#111419">
+  <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <link rel="apple-touch-icon" href="brand/apple-touch-icon.png">
+  <link rel="manifest" href="site.webmanifest">
+  <link rel="stylesheet" href="css/app.css">
+  <script type="module" src="js/app.js"></script>
+</head>
+<body data-format="pdf">
+  <svg class="sprite" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
+    <symbol id="i-file" viewBox="0 0 20 24">
+      <path d="M4 1.5h8.5l5.5 5.5v14a1.5 1.5 0 0 1-1.5 1.5h-12.5a1.5 1.5 0 0 1-1.5-1.5v-18a1.5 1.5 0 0 1 1.5-1.5z"/>
+      <path d="M12.5 1.5v4a1.5 1.5 0 0 0 1.5 1.5h4" fill="none"/>
+    </symbol>
+    <symbol id="i-close" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9.5"/><path d="M7.8 12.4l2.8 2.8 5.6-5.8"/></symbol>
+    <symbol id="i-alert" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9.5"/><path d="M12 7.5v5.5M12 16.3v.2"/></symbol>
+    <symbol id="i-warning" viewBox="0 0 24 24"><path d="M10.3 4.2L2.6 17.6A2 2 0 0 0 4.3 20.6h15.4a2 2 0 0 0 1.7-3L13.7 4.2a2 2 0 0 0-3.4 0z"/><path d="M12 9.5v4M12 16.8v.2"/></symbol>
+    <symbol id="i-download" viewBox="0 0 24 24"><path d="M12 4v11M7 10.5l5 5 5-5M5 19.5h14"/></symbol>
+    <symbol id="i-chevron" viewBox="0 0 24 24"><path d="M6 9.5l6 6 6-6"/></symbol>
+  </svg>
+
+  <div class="shell">
+    <header class="masthead">
+      <svg class="mark" viewBox="0 0 512 512" aria-hidden="true" focusable="false">
+        <rect class="mark-tile" width="512" height="512" rx="128"/>
+        <path class="mark-glyph" fill-rule="evenodd" d="M96 96H336A80 80 0 0 1 336 256H256V288A32 32 0 0 0 288 320H320V352H96V320H128A32 32 0 0 0 160 288V160A32 32 0 0 0 128 128H96ZM256 128V224H304A48 48 0 0 0 304 128Z"/>
+        <path class="mark-rule" d="M96 384H416V416H96Z"/>
+      </svg>
+      <div class="masthead-text">
+        <h1 class="brand">Prelo</h1>
+        <p class="tagline">Converta Markdown em PDF ou Word mantendo tabelas, código, diagramas Mermaid e muito mais.</p>
+      </div>
+    </header>
+
+    <main class="main">
+      <noscript>
+        <p class="noscript">Esta página precisa de JavaScript para converter arquivos. A conversão também está disponível pela <a href="docs">API documentada</a>.</p>
+      </noscript>
+
+      <form class="card" id="converter" novalidate>
+        <fieldset class="controls" id="controls">
+          <legend class="visually-hidden">Arquivo e opções de conversão</legend>
+
+          <div class="upload">
+            <input type="file" id="file-input" name="file" hidden
+                   accept=".md,.markdown,.mdown,.mkd,.mkdn,.txt,.zip,text/markdown,text/plain,application/zip">
+            <button type="button" class="dropzone" id="dropzone"
+                    aria-labelledby="dropzone-title" aria-describedby="dropzone-hint">
+              <svg class="dropzone-art" viewBox="0 0 72 80" aria-hidden="true" focusable="false">
+                <path class="art-page" d="M12 4h32l18 18v46a6 6 0 0 1-6 6H12a6 6 0 0 1-6-6V10a6 6 0 0 1 6-6z"/>
+                <path class="art-fold" d="M44 4v12a6 6 0 0 0 6 6h12"/>
+                <path class="art-hash" d="M16.5 29.5h9M16 35h9M20.5 25.5l-1.6 13.5M25 25.5l-1.6 13.5"/>
+                <path class="art-heading" d="M31 32.5h17"/>
+                <path class="art-text" d="M17 47h1.5M23.5 47h21M17 55h1.5M23.5 55h15M17 63h1.5M23.5 63h10"/>
+                <circle class="art-badge" cx="56" cy="64" r="12"/>
+                <path class="art-arrow" d="M56 70v-11.5M51 63l5-5 5 5"/>
+              </svg>
+              <span class="dropzone-title" id="dropzone-title">Arraste seu arquivo aqui ou clique para escolher</span>
+              <span class="dropzone-hint" id="dropzone-hint">Formatos: .md, .markdown, .txt ou .zip (Markdown + imagens)<span id="size-limit" hidden></span></span>
+            </button>
+
+            <div class="file-chip" id="file-chip" hidden>
+              <span class="file-badge" id="file-badge" aria-hidden="true">MD</span>
+              <span class="file-text">
+                <span class="file-name" id="file-name"></span>
+                <span class="file-meta" id="file-meta"></span>
+              </span>
+              <button type="button" class="icon-button" id="file-remove" aria-label="Remover arquivo">
+                <svg class="icon" aria-hidden="true" focusable="false"><use href="#i-close"/></svg>
+              </button>
+            </div>
+
+            <p class="field-error" id="file-error" hidden>
+              <svg class="icon" aria-hidden="true" focusable="false"><use href="#i-alert"/></svg>
+              <span id="file-error-text"></span>
+            </p>
+          </div>
+
+          <fieldset class="field">
+            <legend class="field-label">Formato de saída</legend>
+            <div class="segmented">
+              <label class="segment segment-pdf">
+                <input type="radio" name="format" value="pdf" checked>
+                <span class="segment-face">
+                  <svg class="format-icon" aria-hidden="true" focusable="false"><use href="#i-file"/></svg>
+                  PDF
+                </span>
+              </label>
+              <label class="segment segment-docx">
+                <input type="radio" name="format" value="docx">
+                <span class="segment-face">
+                  <svg class="format-icon" aria-hidden="true" focusable="false"><use href="#i-file"/></svg>
+                  Word (.docx)
+                </span>
+              </label>
+            </div>
+          </fieldset>
+
+          <details class="advanced" id="advanced">
+            <summary class="advanced-summary">
+              <span class="advanced-heading">
+                <span class="advanced-title">Opções avançadas</span>
+                <span class="advanced-current" id="options-summary"></span>
+              </span>
+              <svg class="icon chevron" aria-hidden="true" focusable="false"><use href="#i-chevron"/></svg>
+            </summary>
+            <div class="options-grid">
+              <div class="control">
+                <label for="opt-page-size">Tamanho da página</label>
+                <select id="opt-page-size" name="page_size">
+                  <option value="A4" data-short="A4" selected>A4 (210 × 297 mm)</option>
+                  <option value="Letter" data-short="Carta">Carta (Letter)</option>
+                  <option value="Legal" data-short="Ofício">Ofício (Legal)</option>
+                  <option value="A3" data-short="A3">A3 (297 × 420 mm)</option>
+                  <option value="A5" data-short="A5">A5 (148 × 210 mm)</option>
+                </select>
+              </div>
+              <div class="control">
+                <label for="opt-orientation">Orientação</label>
+                <select id="opt-orientation" name="orientation">
+                  <option value="portrait" data-short="retrato" selected>Retrato</option>
+                  <option value="landscape" data-short="paisagem">Paisagem</option>
+                </select>
+              </div>
+              <div class="control">
+                <label for="opt-margin">Margens</label>
+                <select id="opt-margin" name="margin">
+                  <option value="narrow" data-short="margem estreita">Estreita (12,7 mm)</option>
+                  <option value="normal" data-short="margem normal" selected>Normal (20 mm)</option>
+                  <option value="wide" data-short="margem larga">Larga (30 mm)</option>
+                </select>
+              </div>
+              <div class="control">
+                <label for="opt-mermaid-theme">Tema dos diagramas</label>
+                <select id="opt-mermaid-theme" name="mermaid_theme">
+                  <option value="default" data-short="tema padrão" selected>Padrão</option>
+                  <option value="neutral" data-short="tema neutro">Neutro</option>
+                  <option value="dark" data-short="tema escuro">Escuro</option>
+                  <option value="forest" data-short="tema floresta">Floresta</option>
+                </select>
+              </div>
+              <label class="check">
+                <input type="checkbox" id="opt-toc" name="toc">
+                <span>Incluir sumário</span>
+              </label>
+              <label class="check">
+                <input type="checkbox" id="opt-page-numbers" name="page_numbers" checked>
+                <span>Numerar páginas</span>
+              </label>
+            </div>
+          </details>
+        </fieldset>
+
+        <button type="submit" class="convert" id="convert" disabled>
+          <span class="spinner" aria-hidden="true"></span>
+          <span id="convert-label">Converter para PDF</span>
+        </button>
+
+        <section class="notice notice-success" id="result" hidden aria-labelledby="result-title">
+          <svg class="icon notice-icon" aria-hidden="true" focusable="false"><use href="#i-check"/></svg>
+          <div class="notice-body">
+            <h2 class="notice-title" id="result-title">Pronto! Seu arquivo foi baixado.</h2>
+            <p class="result-file">
+              <span class="result-name" id="result-name"></span>
+              <span class="result-meta" id="result-meta"></span>
+            </p>
+            <button type="button" class="button-secondary" id="download-again">
+              <svg class="icon" aria-hidden="true" focusable="false"><use href="#i-download"/></svg>
+              Baixar novamente
+            </button>
+            <details class="warnings" id="warnings" hidden>
+              <summary class="warnings-summary">
+                <svg class="icon" aria-hidden="true" focusable="false"><use href="#i-warning"/></svg>
+                <span id="warnings-count"></span>
+              </summary>
+              <ul class="warnings-list" id="warnings-list"></ul>
+            </details>
+          </div>
+        </section>
+
+        <section class="notice notice-error" id="error" hidden tabindex="-1" aria-labelledby="error-title">
+          <svg class="icon notice-icon" aria-hidden="true" focusable="false"><use href="#i-alert"/></svg>
+          <div class="notice-body">
+            <h2 class="notice-title" id="error-title">Não foi possível converter</h2>
+            <p class="error-message" id="error-message"></p>
+          </div>
+        </section>
+
+        <p class="visually-hidden" id="announcer" aria-live="polite" aria-atomic="true"></p>
+      </form>
+    </main>
+
+    <footer class="footer">
+      <nav class="footer-links" aria-label="Documentação da API">
+        <a href="docs">Documentação da API (Swagger)</a>
+        <a href="redoc">ReDoc</a>
+      </nav>
+      <span class="version" id="version" hidden></span>
+    </footer>
+  </div>
+
+  <div class="drop-overlay" id="drop-overlay" hidden>
+    <p class="drop-overlay-message">Solte o arquivo para carregar</p>
+  </div>
+</body>
+</html>

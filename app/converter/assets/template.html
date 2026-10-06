@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html$if(lang)$ lang="$lang$"$endif$$if(dir)$ dir="$dir$"$endif$>
+<head>
+<meta charset="utf-8">
+<meta name="color-scheme" content="light">
+$for(author-meta)$
+<meta name="author" content="$author-meta$">
+$endfor$
+$if(date-meta)$
+<meta name="dcterms.date" content="$date-meta$">
+$endif$
+$if(keywords)$
+<meta name="keywords" content="$for(keywords)$$keywords$$sep$, $endfor$">
+$endif$
+$if(description-meta)$
+<meta name="description" content="$description-meta$">
+$endif$
+<title>$pagetitle$</title>
+<style>$highlighting-css$</style>
+<style>/*__DOCUMENT_CSS__*/</style>
+$for(header-includes)$
+$header-includes$
+$endfor$
+</head>
+<body>
+$for(include-before)$
+$include-before$
+$endfor$
+$if(title)$
+<header id="title-block-header">
+<h1 class="title">$title$</h1>
+$if(subtitle)$
+<p class="subtitle">$subtitle$</p>
+$endif$
+$if(author)$
+<p class="authors">$for(author)$<span class="author">$author$</span>$sep$, $endfor$</p>
+$endif$
+$if(date)$
+<p class="date">$date$</p>
+$endif$
+$if(abstract)$
+<section class="abstract">
+<p class="abstract-title">$abstract-title$</p>
+$abstract$
+</section>
+$endif$
+</header>
+$endif$
+$if(toc)$
+<nav id="TOC" role="doc-toc">
+<h2 id="toc-title">$if(toc-title)$$toc-title$$else$Sumário$endif$</h2>
+$table-of-contents$
+</nav>
+$endif$
+<main>
+$body$
+</main>
+$for(include-after)$
+$include-after$
+$endfor$
+</body>
+</html>

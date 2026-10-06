@@ -1,0 +1,48 @@
+name: prelo
+
+services:
+  prelo:
+    # `docker compose up -d` pulls the published image; `docker compose up -d --build` builds it
+    # from this checkout instead.
+    image: ghcr.io/taigorene/prelo:latest
+    build:
+      context: .
+      target: runtime
+    container_name: prelo
+    ports:
+      # Published on the loopback interface only: put a reverse proxy (HTTPS, authentication,
+      # rate limiting) in front of it. PRELO_BIND=0.0.0.0 publishes it on every interface;
+      # note that ports published by Docker bypass host firewalls such as ufw/firewalld.
+      - "${PRELO_BIND:-127.0.0.1}:${PRELO_PORT:-8000}:8000"
+    environment:
+      PRELO_MAX_UPLOAD_MB: "${PRELO_MAX_UPLOAD_MB:-20}"
+      PRELO_MAX_CONCURRENT_JOBS: "${PRELO_MAX_CONCURRENT_JOBS:-4}"
+      PRELO_CONVERSION_TIMEOUT: "${PRELO_CONVERSION_TIMEOUT:-120}"
+      PRELO_ALLOW_REMOTE_IMAGES: "${PRELO_ALLOW_REMOTE_IMAGES:-true}"
+      PRELO_ALLOW_PRIVATE_NETWORKS: "${PRELO_ALLOW_PRIVATE_NETWORKS:-false}"
+      PRELO_MAX_IMAGES_TOTAL_MB: "${PRELO_MAX_IMAGES_TOTAL_MB:-50}"
+      PRELO_CHROMIUM_SANDBOX: "${PRELO_CHROMIUM_SANDBOX:-auto}"
+      PRELO_CORS_ORIGINS: "${PRELO_CORS_ORIGINS:-*}"
+      PRELO_LOG_LEVEL: "${PRELO_LOG_LEVEL:-info}"
+      # uvicorn: its own log level, and the proxies whose X-Forwarded-* headers are trusted
+      # (the address the container sees, e.g. the Docker bridge gateway for a proxy on the host).
+      UVICORN_LOG_LEVEL: "${PRELO_LOG_LEVEL:-info}"
+      FORWARDED_ALLOW_IPS: "${PRELO_TRUSTED_PROXIES:-127.0.0.1,::1}"
+    # A conversion can use up to about 1.2 GB (pandoc's heap is capped at 1 GB): size this as
+    # PRELO_MAX_CONCURRENT_JOBS x 1.2 GB + 1 GB (or lower the number of simultaneous jobs).
+    mem_limit: "${PRELO_MEMORY_LIMIT:-6g}"
+    pids_limit: 1024
+    shm_size: "512m"
+    # Nothing outside /tmp is ever written; uploads and Chromium's files live in RAM there.
+    read_only: true
+    tmpfs:
+      - /tmp:size=1g,mode=1777
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+      # Docker's default profile plus what Chromium's sandbox needs (user namespaces).
+      - seccomp=./seccomp-chromium.json
+    # Running conversions may finish on stop/redeploy (uvicorn waits up to 125 s).
+    stop_grace_period: 135s
+    restart: unless-stopped

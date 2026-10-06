@@ -1,0 +1,21 @@
+# Tool configuration only: Prelo runs from the Docker image or a source checkout (see the
+# README); it is not an installable package. Dependencies: requirements.in / requirements.txt.
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "session"
+asyncio_default_test_loop_scope = "session"
+filterwarnings = [
+    "ignore::DeprecationWarning",
+    "ignore::starlette.exceptions.StarletteDeprecationWarning",
+]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+# Test fixtures are input documents (one is deliberately Latin-1), not code to format.
+extend-exclude = ["tests/fixtures"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP", "SIM"]

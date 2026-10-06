@@ -1,0 +1,155 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+    paths-ignore:
+      - "**/*.md"
+      - "docs/**"
+      - "LICENSE"
+  pull_request:
+    branches: [main]
+    paths-ignore:
+      - "**/*.md"
+      - "docs/**"
+      - "LICENSE"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  lint:
+    name: Lint (ruff)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Run ruff
+        run: |
+          pipx run ruff==0.16.10 check app tests
+          pipx run ruff==0.16.10 format --check app tests
+
+  build-and-test:
+    name: Build, tests and smoke test
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    env:
+      BASE_URL: http://localhost:8000
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v4
+
+      - name: Build test image
+        uses: docker/build-push-action@v7
+        with:
+          context: .
+          target: test
+          tags: prelo:test
+          load: true
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Run test suite
+        run: docker run --rm --init --shm-size=512m prelo:test
+
+      - name: Build runtime image
+        uses: docker/build-push-action@v7
+        with:
+          context: .
+          target: runtime
+          tags: prelo:ci
+          load: true
+          cache-from: type=gha
+
+      - name: Check that the container does not run as root
+        run: |
+          uid="$(docker run --rm --entrypoint id prelo:ci -u)"
+          echo "uid=$uid"
+          test "$uid" != "0"
+
+      - name: Start container (hardened like docker-compose.yml)
+        run: >-
+          docker run -d --name prelo -p 127.0.0.1:8000:8000 --shm-size=512m
+          --read-only --tmpfs /tmp:size=1g,mode=1777 --cap-drop ALL --pids-limit 1024
+          --security-opt no-new-privileges:true
+          --security-opt seccomp=seccomp-chromium.json prelo:ci
+
+      - name: Wait until healthy
+        run: |
+          for _ in $(seq 1 60); do
+            if curl -fsS "$BASE_URL/api/v1/health"; then
+              echo
+              exit 0
+            fi
+            sleep 2
+          done
+          echo "The service did not become healthy in time." >&2
+          exit 1
+
+      - name: Smoke test - web UI and API docs
+        run: |
+          curl -fsS "$BASE_URL/" | grep 'lang="pt-BR"' > /dev/null
+          curl -fsS "$BASE_URL/docs" | grep -i 'swagger-ui' > /dev/null
+          curl -fsS "$BASE_URL/openapi.json" | python3 -m json.tool > /dev/null
+          curl -fsS "$BASE_URL/api/v1/info" | python3 -m json.tool
+
+      - name: Smoke test - Markdown file to PDF
+        run: |
+          curl -fsS -D pdf-headers.txt -o exemplo-completo.pdf \
+            -F "file=@examples/exemplo-completo.md" -F "toc=true" \
+            "$BASE_URL/api/v1/convert/pdf"
+          test "$(head -c 5 exemplo-completo.pdf)" = "%PDF-"
+          grep -i '^content-type: application/pdf' pdf-headers.txt
+          grep -i '^x-conversion-warnings: \[\]' pdf-headers.txt
+
+      - name: Smoke test - Markdown file to Word
+        run: |
+          curl -fsS -D docx-headers.txt -o exemplo-completo.docx \
+            -F "file=@examples/exemplo-completo.md" -F "orientation=landscape" \
+            "$BASE_URL/api/v1/convert/docx"
+          test "$(head -c 2 exemplo-completo.docx)" = "PK"
+          python3 -m zipfile -l exemplo-completo.docx | grep 'word/document.xml' > /dev/null
+          grep -i '^x-conversion-warnings: \[\]' docx-headers.txt
+
+      - name: Smoke test - JSON text endpoint
+        run: |
+          curl -fsS -o texto.pdf -H "Content-Type: application/json" \
+            -d '{"markdown": "# Olá\n\n| A | B |\n|---|---|\n| 1 | 2 |", "filename": "texto"}' \
+            "$BASE_URL/api/v1/convert/pdf/text"
+          test "$(head -c 5 texto.pdf)" = "%PDF-"
+
+      - name: Smoke test - invalid input is rejected
+        run: |
+          status="$(curl -s -o /dev/null -w '%{http_code}' \
+            -F "file=@LICENSE;filename=programa.exe" "$BASE_URL/api/v1/convert/pdf")"
+          echo "HTTP $status"
+          test "$status" = "415"
+
+      - name: Container logs
+        if: always()
+        run: docker logs prelo || true
+
+      - name: Upload converted documents
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: smoke-test-documents
+          path: |
+            exemplo-completo.pdf
+            exemplo-completo.docx
+          if-no-files-found: ignore
+          retention-days: 7
+
+      - name: Stop container
+        if: always()
+        run: docker rm -f prelo || true

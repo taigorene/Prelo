@@ -1,0 +1,16 @@
+# Build context allowlist: only what the Dockerfile copies.
+*
+!app/
+!tests/
+!examples/
+!scripts/fetch_vendor.sh
+!requirements.txt
+!requirements-dev.txt
+!pyproject.toml
+
+# Never ship caches or bytecode, even inside allowed directories.
+**/__pycache__
+**/*.py[cod]
+**/.pytest_cache
+**/.ruff_cache
+**/.DS_Store

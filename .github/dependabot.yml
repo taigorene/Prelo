@@ -1,0 +1,21 @@
+# Weekly update pull requests for the pinned dependencies. Chromium security fixes only
+# arrive through Playwright updates (pip), so keep those merged.
+version: 2
+updates:
+  - package-ecosystem: pip
+    directory: /
+    schedule:
+      interval: weekly
+    groups:
+      python:
+        patterns: ["*"]
+
+  - package-ecosystem: docker
+    directory: /
+    schedule:
+      interval: weekly
+
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly

@@ -1,0 +1,825 @@
+/*
+ * Prelo - stylesheet for the PDF output.
+ *
+ * GitHub-like light theme tuned for print. The HTML is produced by pandoc from
+ * GitHub-flavoured Markdown and printed by headless Chromium with JavaScript
+ * disabled. Page size and margins come from the print call (no @page margins
+ * here) and the footer with page numbers is a Chromium footer template.
+ */
+
+:root {
+  --fg: #1f2328;
+  --fg-muted: #59636e;
+  --border: #d1d9e0;
+  --border-muted: #e3e8ed;
+  --bg-subtle: #f6f8fa;
+  --bg-code-inline: #eff1f3;
+  --bg-table-head: #eef1f4;
+  --accent: #0969da;
+  --note: #0969da;
+  --tip: #1a7f37;
+  --important: #8250df;
+  --warning: #9a6700;
+  --caution: #d1242f;
+  --radius: 6px;
+  --font-sans: "Inter Variable", "Inter", "Noto Sans", "DejaVu Sans", "Liberation Sans",
+    "Noto Color Emoji", sans-serif;
+  --font-mono: "JetBrains Mono", "DejaVu Sans Mono", "Liberation Mono", "Noto Color Emoji",
+    monospace;
+  --font-math: "DejaVu Math TeX Gyre", "STIX Two Math", "Latin Modern Math", "Noto Sans Math",
+    math;
+  --font-emoji: "Noto Color Emoji", sans-serif;
+}
+
+/* ---------------------------------------------------------------- base -- */
+
+html {
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  color: var(--fg);
+  background: #fff;
+  font-family: var(--font-sans);
+  font-size: 10.5pt;
+  line-height: 1.6;
+  font-kerning: normal;
+  /* Keep the text as typed: no "->" arrows or "1x2" multiplication signs from Inter. */
+  font-variant-ligatures: no-contextual;
+  text-rendering: optimizeLegibility;
+  overflow-wrap: break-word;
+  orphans: 3;
+  widows: 3;
+}
+
+main > :first-child {
+  margin-top: 0;
+}
+
+p,
+blockquote,
+ul,
+ol,
+dl,
+table,
+pre,
+details,
+figure,
+div.sourceCode {
+  margin-top: 0;
+  margin-bottom: 1em;
+}
+
+a {
+  color: var(--accent);
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-decoration-color: color-mix(in srgb, var(--accent) 40%, transparent);
+  text-underline-offset: 0.18em;
+}
+
+strong,
+b {
+  font-weight: 600;
+}
+
+sup,
+sub {
+  position: relative;
+  font-size: 0.75em;
+  line-height: 0;
+  vertical-align: baseline;
+}
+
+sup {
+  top: -0.5em;
+}
+
+sub {
+  bottom: -0.25em;
+}
+
+mark {
+  padding: 0 0.15em;
+  color: inherit;
+  background: #fff8c5;
+  border-radius: 2px;
+}
+
+abbr[title] {
+  text-decoration: underline dotted;
+}
+
+hr {
+  box-sizing: content-box;
+  height: 2px;
+  margin: 1.75em 0;
+  padding: 0;
+  overflow: hidden;
+  background: var(--border);
+  border: 0;
+}
+
+.page-break {
+  break-after: page;
+}
+
+/* ------------------------------------------------------------ headings -- */
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  margin: 1.6em 0 0.65em;
+  font-weight: 600;
+  line-height: 1.25;
+  color: var(--fg);
+  break-after: avoid;
+  break-inside: avoid;
+}
+
+h1 {
+  font-size: 1.9em;
+  padding-bottom: 0.3em;
+  border-bottom: 1px solid var(--border);
+  letter-spacing: -0.015em;
+}
+
+h2 {
+  font-size: 1.45em;
+  padding-bottom: 0.3em;
+  border-bottom: 1px solid var(--border);
+  letter-spacing: -0.01em;
+}
+
+h3 {
+  font-size: 1.2em;
+}
+
+h4 {
+  font-size: 1em;
+}
+
+h5 {
+  font-size: 0.9em;
+}
+
+h6 {
+  font-size: 0.85em;
+  color: var(--fg-muted);
+}
+
+:is(h1, h2, h3, h4, h5, h6) code {
+  font-size: 0.9em;
+}
+
+/* --------------------------------------------------------- title block -- */
+
+#title-block-header {
+  margin: 0 0 2.25em;
+  padding-bottom: 1.25em;
+  border-bottom: 1px solid var(--border);
+}
+
+#title-block-header > :last-child {
+  margin-bottom: 0;
+}
+
+#title-block-header h1.title {
+  margin: 0 0 0.3em;
+  padding: 0;
+  font-size: 2.35em;
+  font-weight: 700;
+  line-height: 1.15;
+  letter-spacing: -0.025em;
+  border: 0;
+}
+
+#title-block-header .subtitle {
+  margin: 0 0 1em;
+  font-size: 1.25em;
+  line-height: 1.35;
+  color: var(--fg-muted);
+}
+
+#title-block-header .authors {
+  margin: 0;
+  font-weight: 500;
+}
+
+#title-block-header .date {
+  margin: 0.15em 0 0;
+  font-size: 0.95em;
+  color: var(--fg-muted);
+}
+
+#title-block-header .abstract {
+  margin: 1.5em 0 0;
+  padding: 0.9em 1.1em;
+  font-size: 0.95em;
+  background: var(--bg-subtle);
+  border-radius: var(--radius);
+}
+
+#title-block-header .abstract-title {
+  margin: 0 0 0.4em;
+  font-size: 0.78em;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--fg-muted);
+}
+
+#title-block-header .abstract > :last-child {
+  margin-bottom: 0;
+}
+
+/* ----------------------------------------------------- table of contents -- */
+
+nav#TOC {
+  margin: 0 0 2em;
+  break-after: page;
+}
+
+nav#TOC > h2 {
+  margin-top: 0;
+}
+
+nav#TOC ul {
+  margin: 0;
+  padding-inline-start: 0;
+  list-style: none;
+}
+
+nav#TOC ul ul {
+  padding-inline-start: 1.25em;
+}
+
+nav#TOC li {
+  margin: 0;
+}
+
+nav#TOC > ul > li + li {
+  margin-top: 0.4em;
+}
+
+nav#TOC > ul > li > a {
+  font-weight: 600;
+}
+
+nav#TOC a {
+  display: block;
+  padding: 0.12em 0;
+  color: var(--fg);
+  text-decoration: none;
+}
+
+nav#TOC ul ul a {
+  color: #3d444d;
+}
+
+/* --------------------------------------------------------------- lists -- */
+
+ul,
+ol {
+  padding-inline-start: 2em;
+}
+
+:is(ul, ol) :is(ul, ol) {
+  margin-top: 0.25em;
+  margin-bottom: 0;
+}
+
+:is(ol, ul) ol:is(:not([type]), [type="1"]) {
+  list-style-type: lower-roman;
+}
+
+:is(ol, ul) :is(ol, ul) ol:is(:not([type]), [type="1"]) {
+  list-style-type: lower-alpha;
+}
+
+li + li {
+  margin-top: 0.25em;
+}
+
+/* Loose list items (paragraphs) are spaced like GitHub does; other blocks hug the item. */
+li > p {
+  margin-top: 0.75em;
+  margin-bottom: 0.75em;
+}
+
+li > :is(pre, div.sourceCode, blockquote, table, figure, details, div) {
+  margin-top: 0.6em;
+  margin-bottom: 0.6em;
+}
+
+li > :not(p):first-child {
+  margin-top: 0;
+}
+
+li > :not(p):last-child {
+  margin-bottom: 0;
+}
+
+/* Task lists: the checkbox hangs where the bullet would be. */
+ul.task-list {
+  list-style: none;
+}
+
+/* pandoc splits lists that mix task and plain items: keep the pieces together. */
+ul:has(+ ul.task-list),
+ul.task-list:has(+ ul) {
+  margin-bottom: 0;
+}
+
+:is(ul.task-list + ul, ul + ul.task-list) {
+  margin-top: 0.25em;
+}
+
+/* Task items of ordered lists (GitHub shows them too): the checkbox replaces the number. */
+li:has(> input.task-list-item-checkbox:first-child),
+li:has(> p:first-child > input.task-list-item-checkbox:first-child) {
+  list-style: none;
+}
+
+:is(ul.task-list, li) input[type="checkbox"] {
+  appearance: none;
+  display: inline-block;
+  box-sizing: border-box;
+  width: 1em;
+  height: 1em;
+  margin: 0;
+  margin-inline: -1.55em 0.55em;
+  vertical-align: -0.14em;
+  background: #fff;
+  border: 1.5px solid #8c959f;
+  border-radius: 3px;
+}
+
+:is(ul.task-list, li) input[type="checkbox"]:checked {
+  background: var(--accent)
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath fill='none' stroke='%23fff' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round' d='M3.5 8.5l3 3 6-7'/%3E%3C/svg%3E")
+    center / 85% no-repeat;
+  border-color: var(--accent);
+}
+
+/* ---------------------------------------------------- definition lists -- */
+
+dl {
+  padding: 0;
+}
+
+dt {
+  margin-top: 0.75em;
+  font-weight: 600;
+}
+
+dt:first-child {
+  margin-top: 0;
+}
+
+dd {
+  margin: 0.15em 0 0;
+  padding-inline-start: 1.25em;
+}
+
+/* ---------------------------------------------------------------- code -- */
+
+code,
+kbd,
+samp,
+pre {
+  font-family: var(--font-mono);
+  font-variant-ligatures: none;
+}
+
+:not(pre) > code {
+  padding: 0.12em 0.38em;
+  font-size: 0.84em;
+  white-space: break-spaces;
+  background: var(--bg-code-inline);
+  border-radius: 4px;
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
+}
+
+pre {
+  direction: ltr;
+  padding: 0.85em 1em;
+  font-size: 0.82em;
+  line-height: 1.5;
+  color: var(--fg);
+  background: var(--bg-subtle);
+  border: 1px solid var(--border-muted);
+  border-radius: var(--radius);
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  tab-size: 4;
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
+}
+
+pre code {
+  padding: 0;
+  font-size: 100%;
+  white-space: inherit;
+  background: transparent;
+  border: 0;
+}
+
+div.sourceCode {
+  background: transparent;
+}
+
+div.sourceCode > pre.sourceCode {
+  margin: 0;
+}
+
+/* Highlighted blocks have one inline-block per source line: wrapped lines get a hanging indent. */
+pre > code.sourceCode {
+  white-space: pre-wrap;
+}
+
+pre > code.sourceCode > span {
+  line-height: inherit;
+  text-indent: -6ch;
+  padding-left: 6ch;
+}
+
+pre > code.sourceCode > span:empty {
+  height: 1.5em;
+}
+
+code.sourceCode a {
+  color: inherit;
+  text-decoration: none;
+}
+
+kbd {
+  display: inline-block;
+  padding: 0.15em 0.42em;
+  font-size: 0.78em;
+  line-height: 1.2;
+  color: var(--fg);
+  vertical-align: 0.1em;
+  background: var(--bg-subtle);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  box-shadow: inset 0 -1px 0 var(--border);
+}
+
+/* -------------------------------------------------------------- tables -- */
+
+table {
+  display: table;
+  width: auto;
+  max-width: 100%;
+  border-collapse: collapse;
+  border-spacing: 0;
+  font-size: 0.92em;
+  line-height: 1.45;
+}
+
+thead {
+  display: table-header-group;
+}
+
+tfoot {
+  display: table-footer-group;
+}
+
+tr {
+  break-inside: avoid;
+}
+
+th,
+td {
+  padding: 0.4em 0.75em;
+  vertical-align: top;
+  border: 1px solid var(--border);
+  overflow-wrap: break-word;
+}
+
+th {
+  font-weight: 600;
+  text-align: start;
+  background: var(--bg-table-head);
+}
+
+tbody tr:nth-child(2n) {
+  background: var(--bg-subtle);
+}
+
+:is(td, th) :is(code, a) {
+  overflow-wrap: anywhere;
+}
+
+:is(td, th) > :last-child {
+  margin-bottom: 0;
+}
+
+/* Many columns: tighter cells so wide tables still fit the page width. */
+table:has(tr > :nth-child(6)) {
+  font-size: 0.85em;
+}
+
+table:has(tr > :nth-child(6)) :is(th, td) {
+  padding: 0.35em 0.55em;
+}
+
+table:has(tr > :nth-child(9)) {
+  font-size: 0.78em;
+}
+
+table:has(tr > :nth-child(9)) :is(th, td) {
+  padding: 0.3em 0.4em;
+}
+
+caption {
+  padding-bottom: 0.5em;
+  font-weight: 600;
+  text-align: start;
+  color: var(--fg-muted);
+}
+
+/* ---------------------------------------------------------- blockquote -- */
+
+blockquote {
+  padding: 0 1em;
+  margin-inline: 0;
+  color: var(--fg-muted);
+  border-inline-start: 0.25em solid var(--border);
+}
+
+blockquote > :last-child {
+  margin-bottom: 0;
+}
+
+/* ------------------------------------------- GitHub alerts (> [!NOTE]) -- */
+
+div:is(.note, .tip, .important, .warning, .caution) {
+  --alert: var(--note);
+  margin: 0 0 1em;
+  padding: 0.6em 1em 0.65em;
+  background: color-mix(in srgb, var(--alert) 5%, #fff);
+  border-inline-start: 0.25em solid var(--alert);
+  border-start-end-radius: var(--radius);
+  border-end-end-radius: var(--radius);
+  break-inside: avoid;
+}
+
+div.tip {
+  --alert: var(--tip);
+}
+
+div.important {
+  --alert: var(--important);
+}
+
+div.warning {
+  --alert: var(--warning);
+}
+
+div.caution {
+  --alert: var(--caution);
+}
+
+div:is(.note, .tip, .important, .warning, .caution) > :last-child {
+  margin-bottom: 0;
+}
+
+div:is(.note, .tip, .important, .warning, .caution) > div.title {
+  display: flex;
+  align-items: center;
+  gap: 0.5em;
+  margin-bottom: 0.35em;
+  font-weight: 600;
+  line-height: 1.25;
+  color: var(--alert);
+}
+
+div:is(.note, .tip, .important, .warning, .caution) > div.title > p {
+  margin: 0;
+}
+
+div:is(.note, .tip, .important, .warning, .caution) > div.title::before {
+  content: "";
+  flex: none;
+  width: 1em;
+  height: 1em;
+  background: center / contain no-repeat;
+}
+
+/* Icons: Primer Octicons (MIT), info / light-bulb / report / alert / stop. */
+div.note > div.title::before {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath fill='%230969da' d='M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8Zm8-6.5a6.5 6.5 0 1 0 0 13 6.5 6.5 0 0 0 0-13ZM6.5 7.75A.75.75 0 0 1 7.25 7h1a.75.75 0 0 1 .75.75v2.75h.25a.75.75 0 0 1 0 1.5h-2a.75.75 0 0 1 0-1.5h.25v-2h-.25a.75.75 0 0 1-.75-.75ZM8 6a1 1 0 1 1 0-2 1 1 0 0 1 0 2Z'/%3E%3C/svg%3E");
+}
+
+div.tip > div.title::before {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath fill='%231a7f37' d='M8 1.5c-2.363 0-4 1.69-4 3.75 0 .984.424 1.625.984 2.304l.214.253c.223.264.47.556.673.848.284.411.537.896.621 1.49a.75.75 0 0 1-1.484.211c-.04-.282-.163-.547-.37-.847a8.456 8.456 0 0 0-.542-.68c-.084-.1-.173-.205-.268-.32C3.201 7.75 2.5 6.766 2.5 5.25 2.5 2.31 4.863 0 8 0s5.5 2.31 5.5 5.25c0 1.516-.701 2.5-1.328 3.259-.095.115-.184.22-.268.319-.207.245-.383.453-.541.681-.208.3-.33.565-.37.847a.751.751 0 0 1-1.485-.212c.084-.593.337-1.078.621-1.489.203-.292.45-.584.673-.848.075-.088.147-.173.213-.253.561-.679.985-1.32.985-2.304 0-2.06-1.637-3.75-4-3.75ZM5.75 12h4.5a.75.75 0 0 1 0 1.5h-4.5a.75.75 0 0 1 0-1.5ZM6 15.25a.75.75 0 0 1 .75-.75h2.5a.75.75 0 0 1 0 1.5h-2.5a.75.75 0 0 1-.75-.75Z'/%3E%3C/svg%3E");
+}
+
+div.important > div.title::before {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath fill='%238250df' d='M0 1.75C0 .784.784 0 1.75 0h12.5C15.216 0 16 .784 16 1.75v9.5A1.75 1.75 0 0 1 14.25 13H8.06l-2.573 2.573A1.458 1.458 0 0 1 3 14.543V13H1.75A1.75 1.75 0 0 1 0 11.25Zm1.75-.25a.25.25 0 0 0-.25.25v9.5c0 .138.112.25.25.25h2a.75.75 0 0 1 .75.75v2.19l2.72-2.72a.749.749 0 0 1 .53-.22h6.5a.25.25 0 0 0 .25-.25v-9.5a.25.25 0 0 0-.25-.25Zm7 2.25v2.5a.75.75 0 0 1-1.5 0v-2.5a.75.75 0 0 1 1.5 0ZM9 9a1 1 0 1 1-2 0 1 1 0 0 1 2 0Z'/%3E%3C/svg%3E");
+}
+
+div.warning > div.title::before {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath fill='%239a6700' d='M6.457 1.047c.659-1.234 2.427-1.234 3.086 0l6.082 11.378A1.75 1.75 0 0 1 14.082 15H1.918a1.75 1.75 0 0 1-1.543-2.575Zm1.763.707a.25.25 0 0 0-.44 0L1.698 13.132a.25.25 0 0 0 .22.368h12.164a.25.25 0 0 0 .22-.368Zm.53 3.996v2.5a.75.75 0 0 1-1.5 0v-2.5a.75.75 0 0 1 1.5 0ZM9 11a1 1 0 1 1-2 0 1 1 0 0 1 2 0Z'/%3E%3C/svg%3E");
+}
+
+div.caution > div.title::before {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath fill='%23d1242f' d='M4.47.22A.749.749 0 0 1 5 0h6c.199 0 .389.079.53.22l4.25 4.25c.141.14.22.331.22.53v6a.749.749 0 0 1-.22.53l-4.25 4.25A.749.749 0 0 1 11 16H5a.749.749 0 0 1-.53-.22L.22 11.53A.749.749 0 0 1 0 11V5c0-.199.079-.389.22-.53Zm.84 1.28L1.5 5.31v5.38l3.81 3.81h5.38l3.81-3.81V5.31L10.69 1.5ZM8 4a.75.75 0 0 1 .75.75v3.5a.75.75 0 0 1-1.5 0v-3.5A.75.75 0 0 1 8 4Zm0 8a1 1 0 1 1 0-2 1 1 0 0 1 0 2Z'/%3E%3C/svg%3E");
+}
+
+/* -------------------------------------------------------------- images -- */
+
+img,
+svg,
+video {
+  max-width: 100%;
+}
+
+/*
+ * In print, 1vh is 1% of the page content box. Keeping images clearly shorter than a page avoids
+ * slicing them and leaves room for the heading(s) that introduce them.
+ */
+img {
+  max-height: 80vh;
+  height: auto;
+  object-fit: contain;
+  border-style: none;
+}
+
+figure {
+  margin-inline: 0;
+}
+
+figcaption {
+  margin-top: 0.5em;
+  font-size: 0.9em;
+  text-align: center;
+  color: var(--fg-muted);
+}
+
+/* -------------------------------------------------------------- mermaid -- */
+
+figure.mermaid-diagram {
+  margin: 1.25em 0;
+  text-align: center;
+  break-inside: avoid;
+}
+
+figure.mermaid-diagram img {
+  display: inline-block;
+  width: auto;
+  max-width: 100%;
+  height: auto;
+  max-height: 80vh;
+  vertical-align: top;
+}
+
+:is(pre, div.sourceCode):has(+ .mermaid-error) {
+  margin-bottom: 0;
+}
+
+:is(pre, div.sourceCode):has(+ .mermaid-error),
+:is(pre, div.sourceCode):has(+ .mermaid-error) > pre {
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+div.mermaid-error {
+  margin: 0 0 1em;
+}
+
+div.mermaid-error > p,
+p.mermaid-error {
+  margin: 0 0 1em;
+  padding: 0.5em 0.9em;
+  font-size: 0.88em;
+  line-height: 1.45;
+  color: #82071e;
+  background: #ffebe9;
+  border: 1px solid #ffcecb;
+  border-radius: 0 0 var(--radius) var(--radius);
+}
+
+div.mermaid-error > p {
+  margin: 0;
+}
+
+/* ---------------------------------------------------------------- math -- */
+
+math {
+  font-family: var(--font-math);
+}
+
+math[display="block"] {
+  margin: 0.75em 0;
+  overflow-wrap: normal;
+}
+
+/*
+ * Multi-line equations (aligned/align): texmath writes them as tables, whose cells Chromium
+ * typesets in the compact (script) style; LaTeX keeps display-size fractions there. The cells
+ * of aligned rows carry "padding-right: 0" / "padding-left: 0"; matrices and cases do not.
+ */
+math[display="block"] mtable:has(> mtr > mtd[style*="padding-right: 0"]) {
+  math-style: normal;
+}
+
+/* \boxed{}: Chromium does not draw menclose. */
+menclose[notation~="box"] {
+  padding: 0.15em 0.3em;
+  border: 1px solid currentColor;
+}
+
+/* --------------------------------------------------------------- emoji -- */
+
+span.emoji {
+  font-family: var(--font-emoji);
+  font-style: normal;
+  font-weight: 400;
+}
+
+/* ---------------------------------------------------- details / summary -- */
+
+details {
+  padding: 0 1em;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+
+/* A PDF cannot be clicked open: the content of <details> is always shown, even when closed. */
+details::details-content {
+  content-visibility: visible;
+}
+
+details > summary {
+  margin: 0 -1em 0.75em;
+  padding: 0.5em 1em;
+  font-weight: 600;
+  list-style-type: disclosure-open;
+  background: var(--bg-subtle);
+  border-bottom: 1px solid var(--border);
+  border-radius: var(--radius) var(--radius) 0 0;
+}
+
+details > summary::marker {
+  color: var(--fg-muted);
+}
+
+details > :last-child {
+  margin-bottom: 0.75em;
+}
+
+/* ----------------------------------------------------------- footnotes -- */
+
+a.footnote-ref {
+  text-decoration: none;
+}
+
+a.footnote-ref sup {
+  padding: 0 0.1em;
+  font-weight: 600;
+}
+
+section.footnotes {
+  margin-top: 2.5em;
+  font-size: 0.88em;
+  color: var(--fg-muted);
+}
+
+section.footnotes > hr {
+  width: 33%;
+  height: 1px;
+  margin: 0 0 1em;
+}
+
+section.footnotes ol {
+  padding-inline-start: 1.5em;
+}
+
+section.footnotes li + li {
+  margin-top: 0.4em;
+}
+
+section.footnotes li > p {
+  margin: 0 0 0.4em;
+}
+
+section.footnotes li > :last-child {
+  margin-bottom: 0;
+}
+
+a.footnote-back {
+  margin-inline-start: 0.25em;
+  font-family: "DejaVu Sans", sans-serif;
+  text-decoration: none;
+}

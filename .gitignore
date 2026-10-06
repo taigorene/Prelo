@@ -1,0 +1,30 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.coverage
+htmlcov/
+
+# Downloaded third-party assets (see scripts/fetch_vendor.sh)
+vendor/
+
+# Generated artifacts
+*.pdf
+*.docx
+!tests/fixtures/**
+out/
+tmp/
+
+# Editors / OS
+.DS_Store
+.idea/
+.vscode/
+*.swp
+
+# Local environment
+.env

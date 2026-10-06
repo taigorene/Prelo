@@ -1,0 +1,7 @@
+# Test dependencies (top level). requirements-dev.txt is generated from this file (with the
+# runtime requirements as constraints): run `make lock` after editing it.
+-c requirements.txt
+pytest==9.1.1
+pytest-asyncio==1.4.0
+pypdf==6.19.0
+python-docx==1.2.0

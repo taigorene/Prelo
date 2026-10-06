@@ -1,0 +1,14 @@
+# Normalize text files to LF on every platform (Git for Windows defaults to CRLF
+# checkouts, which would break the shell scripts run inside the Docker build).
+* text=auto eol=lf
+*.sh text eol=lf
+
+# Binary files
+*.png binary
+*.ico binary
+*.pdf binary
+*.docx binary
+*.zip binary
+
+# Byte-exact test input (Latin-1 text)
+tests/fixtures/latin1.md -text
