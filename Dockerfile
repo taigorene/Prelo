@@ -3,7 +3,7 @@
 # ---------------------------------------------------------------------------
 # base: system dependencies (pandoc, headless Chromium, fonts) + Python deps
 # ---------------------------------------------------------------------------
-FROM python:3.13-slim-trixie@sha256:3dd7cc108ec1493442514f5c2a871af6af0ec31d768ff6e378a93340c3b3db5f AS base
+FROM python:3.15-slim-trixie@sha256:65a65fc7b30b06cb6df4930fd4650697cb23f4c2698ab81fc87e4b031bc36928 AS base
 
 ARG TARGETARCH
 ARG PANDOC_VERSION=3.12
